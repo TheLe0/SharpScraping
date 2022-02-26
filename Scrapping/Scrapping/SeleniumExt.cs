@@ -7,23 +7,26 @@ namespace Scrapping
     {
         public static IWebElement FindElement(this IWebDriver driver, By by, int timeoutInSeconds)
         {
-            if (timeoutInSeconds > 0)
+            if (timeoutInSeconds <= 0)
             {
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
-
-                return wait.Until(drv =>
-                {
-                    try
-                    {
-                        return drv.FindElement(by);
-                    }
-                    catch (Exception)
-                    {
-                        return null;
-                    }
-                });
+                return driver.FindElement(by);
             }
-            return driver.FindElement(by);
+
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
+
+            var element = wait.Until(drv =>
+            {
+                try
+                {
+                    return drv.FindElement(by);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            });
+
+            return element!;
         }
 
         public static void WaitMs(this IWebDriver driver, double delay)
@@ -33,7 +36,7 @@ namespace Scrapping
             {
                 PollingInterval = TimeSpan.FromMilliseconds(delay)
             };
-            wait.Until(wd => (DateTime.Now - now) - TimeSpan.FromMilliseconds(delay) > TimeSpan.Zero);
+            wait.Until(_ => (DateTime.Now - now) - TimeSpan.FromMilliseconds(delay) > TimeSpan.Zero);
         }
 
         public static bool ExistElement(this IWebDriver driver, By by, int timeoutInSeconds)

@@ -10,7 +10,7 @@ namespace Scrapping
 
         private readonly SeleniumConfig _config;
         private readonly Actions _actions;
-        private IWebDriver _driver;
+        private readonly IWebDriver _driver;
 
 
         public WebServerExport(SeleniumConfig config)
@@ -76,9 +76,11 @@ namespace Scrapping
         {
             ClickCounter();
 
+            var button = _driver.FindElement(By.XPath("//button[contains(text(),'Click me')]"), _config.Timeout);
+
             for (var i = 0; i <= 10; i++)
             {
-                XPathClick("//button[contains(text(),'Click me')]");
+                _actions.MoveToElement(button).Click();
             }
         }
 
@@ -102,7 +104,6 @@ namespace Scrapping
         public void Dispose()
         { 
             _driver.Quit();
-            _driver = null;
         }
 
 
@@ -141,12 +142,6 @@ namespace Scrapping
         public void ClickFetchDownload()
         {
             XPathClick("//*[@id=\"app\"]/div/div/div[2]/nav/div[5]/a");
-        }
-
-
-        public void ClickFetchLogin()
-        {
-            XPathClick("//*[@id=\"app\"]/div/div/div[2]/nav/div[6]/a");
         }
 
         public void ClickNextPage(bool hasAlert = false)
