@@ -40,11 +40,11 @@ else
         </tbody>
     </table>
     @if (page>0){
-        <button @onclick="previousPage">Anterior</button>
+        <button @onclick="previousPage">Previous</button>
     }
     @if(page+1 < maxPage)
     {
-        <button @onclick="nextPage">Proxima</button>    
+        <button @onclick="nextPage">Next</button>    
     } 
 }
 
@@ -72,14 +72,14 @@ else
     }
     public async Task nextPage()
     {
-        await JsRuntime.InvokeVoidAsync("alert", "Proxima pagina");
+        await JsRuntime.InvokeVoidAsync("alert", "Next Page");
 
         if(page+1 < maxPage)
             page = page + 1;
     }
     public async Task previousPage()
     {
-        await JsRuntime.InvokeVoidAsync("alert", "Pagina anteior");
+        await JsRuntime.InvokeVoidAsync("alert", "Previous Page");
         if (page>0)
             page = page -1;
     }

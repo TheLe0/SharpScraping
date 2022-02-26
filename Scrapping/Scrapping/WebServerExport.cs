@@ -151,7 +151,7 @@ namespace Scrapping
 
         public void ClickNextPage(bool hasAlert = false)
         {
-            XPathClick("//button[contains(text(),'Proxima')]");
+            XPathClick("//button[contains(text(),'Next')]");
             if (hasAlert)
             {
                 ClickAlert();
@@ -161,7 +161,7 @@ namespace Scrapping
 
         public void ClickPreviousPage(bool hasAlert = false)
         {            
-            XPathClick("//button[contains(text(),'Anterior')]");
+            XPathClick("//button[contains(text(),'Previous')]");
 
             if (hasAlert)
             { 
@@ -178,7 +178,7 @@ namespace Scrapping
         public void GetInfos()
         {
             var loop = true;
-            const string buttonName = "Proxima";
+            const string buttonName = "Next";
 
             try
             {

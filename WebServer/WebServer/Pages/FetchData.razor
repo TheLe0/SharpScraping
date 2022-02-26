@@ -39,11 +39,11 @@ else
         </tbody>
     </table>
     @if (page>0){
-        <button @onclick="previousPage">Anterior</button>
+        <button @onclick="previousPage">Previous</button>
     }
     @if(page+1 < maxPage)
     {
-        <button @onclick="nextPage">Proxima</button>    
+        <button @onclick="nextPage">Next</button>    
     }    
 }
 
