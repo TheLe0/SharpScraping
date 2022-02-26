@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using Scrapping.Models;
 
 namespace Scrapping
@@ -7,15 +8,16 @@ namespace Scrapping
     public  class WebServerExport : IDisposable
     {
 
-        private SeleniumConfig _config;
+        private readonly SeleniumConfig _config;
+        private readonly Actions _actions;
         private IWebDriver _driver;
 
 
         public WebServerExport(SeleniumConfig config)
         {
 
-             this._config = config;
-             ChromeOptions optionsFF = new ChromeOptions();
+             _config = config;
+             var optionsFf = new ChromeOptions();
              var chromeDriverService = ChromeDriverService.CreateDefaultService(AppContext.BaseDirectory);
 
 
@@ -23,64 +25,88 @@ namespace Scrapping
             chromeDriverService.SuppressInitialDiagnosticInformation = true;
 
 
-            optionsFF.AddArgument("--start-maximized");
-            optionsFF.AddArgument("--disable-gpu");
-            optionsFF.AddArgument("--disable-extensions");
-            optionsFF.AddArgument("--window-size=1920,1080");
+            optionsFf.AddArgument("--start-maximized");
+            optionsFf.AddArgument("--disable-gpu");
+            optionsFf.AddArgument("--disable-extensions");
+            optionsFf.AddArgument("--window-size=1920,1080");
 
 
-            optionsFF.AddUserProfilePreference("download.default_directory", AppContext.BaseDirectory);
+            optionsFf.AddUserProfilePreference("download.default_directory", AppContext.BaseDirectory);
 
 
             if (_config.Headless == 1)
             {
-                optionsFF.AddArgument("--headless");
+                optionsFf.AddArgument("--headless");
             }
 
-            _driver = new ChromeDriver(chromeDriverService, optionsFF);
+            _driver = new ChromeDriver(chromeDriverService, optionsFf);
 
 
-            _driver.Navigate().GoToUrl(_config.UrlPagina);
+            _driver.Navigate().GoToUrl(_config.UrlPage);
+
+            _actions = new Actions(_driver);
         }
 
-
-        public void InitExport()
+        public void FetchDataPage()
         {
-
-            ClickFetch(); 
-
-
-            ClickNextPage();
-            ClickNextPage();
-            ClickPreviousPage();            
-
-
-
-            ClickFetchAlert();
-            ClickNextPage(true);
-            ClickPreviousPage(true);
-
-
-            ClickFetchDownload();
-            ClickDownload();
-
-
-            ClickFetchLogin();
-
-
-            SendAuthentication();
-            
-            Console.WriteLine("Press enter after resolve the captcha and do the login.");
-            Console.ReadLine();
-            ClickNextPage();
-            ClickNextPage();
-            ClickPreviousPage();
-
-
-
             ClickFetch();
 
             GetInfos();
+        }
+
+        public void FetchDataAlertPage()
+        {
+            ClickFetchAlert();
+            ClickNextPage(true);
+            ClickPreviousPage(true);
+        }
+
+        public void FetchDataDownloadPage()
+        {
+            ClickFetchDownload();
+            ClickDownload();
+        }
+
+        public void FetchDataLoginPage()
+        {
+            ClickFetchLogin();
+
+            SendAuthentication();
+
+            ClickNextPage();
+            ClickNextPage();
+            ClickPreviousPage();
+        }
+
+        public void HomePage()
+        {
+            ClickHome();
+        }
+
+        public void CounterPage()
+        {
+            ClickCounter();
+
+            for (var i = 0; i <= 10; i++)
+            {
+                XPathClick("//button[contains(text(),'Click me')]");
+            }
+        }
+
+        public void InitExport()
+        {
+            FetchDataAlertPage();
+
+            FetchDataDownloadPage();
+
+            CounterPage();
+
+            //FetchDataLoginPage();
+
+            FetchDataPage();
+
+            HomePage();
+
             Console.ReadLine();
 
         }
@@ -96,6 +122,10 @@ namespace Scrapping
         public void ClickFetch()
         {
             XPathClick("//*[@id=\"app\"]/div/div/div[2]/nav/div[3]/a");
+
+            ClickNextPage();
+            ClickNextPage();
+            ClickPreviousPage();
         }
 
 
@@ -108,6 +138,16 @@ namespace Scrapping
         public void ClickAlert()
         {
             _driver.SwitchTo().Alert().Accept();
+        }
+
+        public void ClickHome()
+        {
+            XPathClick("//*[@id=\"app\"]/div/div/div[2]/nav/div[1]/a");
+        }
+
+        public void ClickCounter()
+        {
+            XPathClick("//*[@id=\"app\"]/div/div/div[2]/nav/div[2]/a");
         }
 
   
@@ -148,15 +188,18 @@ namespace Scrapping
             XPathClick("//*[@id=\"app\"]/div/main/article/a");
         }
 
-
         public void SendAuthentication()
         {
             var email = _driver.FindElement(By.XPath("//*[@id=\"typeEmailX\"]"), _config.Timeout);
             var password = _driver.FindElement(By.XPath("//*[@id=\"typePasswordX\"]"), _config.Timeout);
+            var captcha = _driver.FindElement(By.XPath("//*[@id=\"captcha\"]"), _config.Timeout);
+            var login = _driver.FindElement(By.XPath("//*[@id=\"btnlogin\"]"), _config.Timeout);
 
             email.SendKeys(_config.Username);
             password.SendKeys(_config.Password);
+            captcha.SendKeys(_config.Captcha);
 
+            _actions.MoveToElement(login).Click().Build().Perform();
         }
 
 
@@ -212,7 +255,7 @@ namespace Scrapping
                     throw new TimeoutException($"Element not found: ${xpath}");
                 }
             }
-            _driver.WaitMS(_config.Timeout);
+            _driver.WaitMs(_config.Timeout);
         }
 
     }

@@ -9,8 +9,8 @@ namespace Scrapping
         {
             if (timeoutInSeconds > 0)
             {
-                // Timer para ser usado em conjunto com o webdriver
                 var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
+
                 return wait.Until(drv =>
                 {
                     try
@@ -25,33 +25,39 @@ namespace Scrapping
             }
             return driver.FindElement(by);
         }
-        public static void WaitMS(this IWebDriver driver, double delay)
+
+        public static void WaitMs(this IWebDriver driver, double delay)
         {
             var now = DateTime.Now;
-            var wait = new WebDriverWait(driver, TimeSpan.FromMilliseconds(delay));
-            wait.PollingInterval = TimeSpan.FromMilliseconds(delay);
+            var wait = new WebDriverWait(driver, TimeSpan.FromMilliseconds(delay))
+            {
+                PollingInterval = TimeSpan.FromMilliseconds(delay)
+            };
             wait.Until(wd => (DateTime.Now - now) - TimeSpan.FromMilliseconds(delay) > TimeSpan.Zero);
         }
-        public static Boolean ExistElement(this IWebDriver driver, By by, int timeoutInSeconds)
+
+        public static bool ExistElement(this IWebDriver driver, By by, int timeoutInSeconds)
         {
             try
             {
-                if (timeoutInSeconds > 0)
+                if (timeoutInSeconds <= 0)
                 {
-                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
-                    return wait.Until(drv =>
-                    {
-                        try
-                        {
-                            return drv.FindElement(by, timeoutInSeconds).Displayed;
-                        }
-                        catch (Exception)
-                        {
-                            return false;
-                        }
-                    });
+                    return false;
                 }
-                return false;
+
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
+                return wait.Until(drv =>
+                {
+                    try
+                    {
+                        return drv.FindElement(by, timeoutInSeconds).Displayed;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                });
+                
             }
             catch (Exception)
             {
