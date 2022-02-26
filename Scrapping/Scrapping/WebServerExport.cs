@@ -67,17 +67,6 @@ namespace Scrapping
             ClickDownload();
         }
 
-        public void FetchDataLoginPage()
-        {
-            ClickFetchLogin();
-
-            SendAuthentication();
-
-            ClickNextPage();
-            ClickNextPage();
-            ClickPreviousPage();
-        }
-
         public void HomePage()
         {
             ClickHome();
@@ -100,8 +89,6 @@ namespace Scrapping
             FetchDataDownloadPage();
 
             CounterPage();
-
-            //FetchDataLoginPage();
 
             FetchDataPage();
 
@@ -187,21 +174,6 @@ namespace Scrapping
         {
             XPathClick("//*[@id=\"app\"]/div/main/article/a");
         }
-
-        public void SendAuthentication()
-        {
-            var email = _driver.FindElement(By.XPath("//*[@id=\"typeEmailX\"]"), _config.Timeout);
-            var password = _driver.FindElement(By.XPath("//*[@id=\"typePasswordX\"]"), _config.Timeout);
-            var captcha = _driver.FindElement(By.XPath("//*[@id=\"captcha\"]"), _config.Timeout);
-            var login = _driver.FindElement(By.XPath("//*[@id=\"btnlogin\"]"), _config.Timeout);
-
-            email.SendKeys(_config.Username);
-            password.SendKeys(_config.Password);
-            captcha.SendKeys(_config.Captcha);
-
-            _actions.MoveToElement(login).Click().Build().Perform();
-        }
-
 
         public void GetInfos()
         {
